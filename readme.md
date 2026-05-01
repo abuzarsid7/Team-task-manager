@@ -33,11 +33,13 @@ A full-stack web application where teams can manage projects, assign tasks, and 
 ---
 
 ## 📂 Folder Structure
+```
+
 root/
 │
 ├── frontend/          # React frontend
 │
-├── backend/          # Node backend
+├── backend/           # Node backend
 │   ├── controllers/
 │   ├── models/
 │   ├── routes/
@@ -45,6 +47,8 @@ root/
 │
 ├── .env
 ├── package.json
+
+```
 ---
 
 ## ⚙️ Setup Instructions (Local Development)
@@ -157,11 +161,13 @@ Set Environment Variable:
 VITE_API_URL=https://your-backend.up.railway.app/api
 ```
 4. Click Deploy
+   
 ---
+
 ### 4️⃣ Connect Frontend & Backend
 Make sure your frontend is calling the deployed backend URL.
+* Update API base URL in your frontend config (if needed)
 
-Update API base URL in your frontend config (if needed)
 ---
 
 ### 6️⃣ Verify Deployment
@@ -169,6 +175,8 @@ Update API base URL in your frontend config (if needed)
 * Open your frontend URL in browser
 * Try logging in / creating a project
 * Ensure API calls are working
+  
+---
 
 ### 🌐 Live URLs
 
