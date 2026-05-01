@@ -1,6 +1,9 @@
 const User = require("../models/user");
 const Project = require("../models/project");
 
+const normalizeEmail = (email) => (email || "").trim().toLowerCase();
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 // ✅ Get projects for the current user
 exports.getProjects = async (req, res) => {
   try {
@@ -47,6 +50,7 @@ exports.createProject = async (req, res) => {
 exports.addMember = async (req, res) => {
   try {
     const { projectId, email } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
     const project = await Project.findById(projectId);
     if (!project) {
@@ -57,7 +61,7 @@ exports.addMember = async (req, res) => {
       return res.status(403).json({ message: "Only admin can add members" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -83,6 +87,7 @@ exports.addMember = async (req, res) => {
 exports.removeMember = async (req, res) => {
   try {
     const { projectId, email } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
     const project = await Project.findById(projectId);
     if (!project) {
@@ -93,7 +98,9 @@ exports.removeMember = async (req, res) => {
       return res.status(403).json({ message: "Only admin can remove members" });
     }
 
-    const user = await User.findOne({ email });
+    const user =
+      (await User.findOne({ email: normalizedEmail })) ||
+      (await User.findOne({ email: new RegExp(`^${escapeRegex(normalizedEmail)}$`, "i") }));
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

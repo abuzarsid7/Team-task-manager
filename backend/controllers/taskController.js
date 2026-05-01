@@ -93,10 +93,17 @@ exports.getDashboard = async (req, res) => {
       }
     ]);
 
-    // 5. Tasks per user
+    // 5. Tasks per user (only from projects where current user is a member)
+    const userProjects = await Project.find({
+      members: new mongoose.Types.ObjectId(userId)
+    });
+
+    const projectIds = userProjects.map(p => p._id);
+
     const tasksPerUser = await Task.aggregate([
       {
         $match: {
+          project: { $in: projectIds },
           assignedTo: { $ne: null }
         }
       },
@@ -105,6 +112,20 @@ exports.getDashboard = async (req, res) => {
           _id: "$assignedTo",
           count: { $sum: 1 }
         }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo"
+        }
+      },
+      {
+        $unwind: "$userInfo"
+      },
+      {
+        $sort: { count: -1 }
       }
     ]);
 
@@ -133,18 +154,31 @@ exports.createTask = async (req, res) => {
     }
 
     // Only project members can create tasks
-    if (!project.members.includes(req.user.userId)) {
+    const isMember = project.members.some(
+      (member) => member.toString() === req.user.userId
+    );
+
+    if (!isMember) {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    const task = await Task.create({
+    if (assignedTo && !mongoose.Types.ObjectId.isValid(assignedTo)) {
+      return res.status(400).json({ message: "Invalid assigned user" });
+    }
+
+    const taskData = {
       title,
       description,
       dueDate,
       priority,
       project: projectId,
-      assignedTo
-    });
+    };
+
+    if (assignedTo) {
+      taskData.assignedTo = assignedTo;
+    }
+
+    const task = await Task.create(taskData);
 
     res.status(201).json({
       message: "Task created",

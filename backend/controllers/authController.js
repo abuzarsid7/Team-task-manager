@@ -2,10 +2,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
+const normalizeEmail = (email) => (email || "").trim().toLowerCase();
+
 exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = normalizeEmail(email);
+    const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
 
@@ -18,7 +21,7 @@ exports.signup = async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword
     });
 
@@ -31,9 +34,10 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
     // Check user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

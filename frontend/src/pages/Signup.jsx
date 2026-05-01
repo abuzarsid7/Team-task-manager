@@ -26,24 +26,63 @@ export default function Signup() {
   };
 
   return (
-    <div className="center-card">
-      <div className="card">
-        <h2>Create account</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input className="form-input" placeholder="Name" onChange={(e) => setForm({ ...form, name: e.target.value })} />
+    <div className="auth-page">
+      <div className="auth-card card">
+        <div className="auth-panel auth-panel-left signup-panel">
+          <div className="auth-badge">Get started</div>
+          <h1>Create your workspace</h1>
+          <p>
+            Set up your account to create projects, manage members, and keep tasks organized.
+          </p>
+          <ul className="auth-points">
+            <li>Create and manage projects quickly</li>
+            <li>Assign work to teammates with clear ownership</li>
+            <li>See task progress in a clean kanban view</li>
+          </ul>
+        </div>
+
+        <div className="auth-panel auth-panel-right">
+          <div className="auth-header">
+            <h2>Create account</h2>
+            <p>Fill in your details to join the team.</p>
           </div>
-          <div className="form-group">
-            <input className="form-input" placeholder="Email" onChange={(e) => setForm({ ...form, email: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <input className="form-input" type="password" placeholder="Password" onChange={(e) => setForm({ ...form, password: e.target.value })} />
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button className="btn">Signup</button>
-            <Link to="/" className="muted">Back to login</Link>
-          </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label className="form-label">Name</label>
+              <input
+                className="form-input"
+                placeholder="Your name"
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                className="form-input"
+                type="email"
+                placeholder="you@example.com"
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <input
+                className="form-input"
+                type="password"
+                placeholder="Create a secure password"
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+
+            <button className="btn auth-btn" type="submit">Signup</button>
+
+            <div className="auth-footer">
+              <span className="muted">Already have an account?</span>
+              <Link to="/" className="auth-link">Back to login</Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

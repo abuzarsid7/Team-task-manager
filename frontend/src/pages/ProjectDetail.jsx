@@ -57,47 +57,88 @@ export default function ProjectDetail() {
     <div>
       <Navbar />
 
-      <div className="app-container mt-12">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Project Tasks</h2>
-          <div>
-            <button className="btn" onClick={() => setShowModal(true)}>New Task</button>
-          </div>
-        </div>
-
+      <div className="app-container">
         {project && (
-          <div className="card mt-12">
-            <h3>{project.name}</h3>
-            <div className="muted">Admin: {project.admin?.name} ({project.admin?.email})</div>
-
-            <div className="mt-12">
-              <strong>Members</strong>
-              <div>
-                {project.members?.map((m) => (
-                  <div key={m._id} className="muted">{m.name} — {m.email}</div>
-                ))}
+          <>
+            <div className="page-header">
+              <div className="page-header-content">
+                <h1>{project.name}</h1>
+                <p className="project-subtitle">
+                  Led by {project.admin?.name} • {project.members?.length || 0} member{project.members?.length !== 1 ? "s" : ""}
+                </p>
               </div>
+              {project?.admin && project.admin._id === getUserId() && (
+                <button className="btn page-btn" onClick={() => setShowModal(true)}>
+                  + New Task
+                </button>
+              )}
             </div>
 
-            {project.admin && project.admin._id === getUserId() && (
-              <MemberManager projectId={id} onUpdated={fetchProject} />
-            )}
-          </div>
+            <div className="project-info-grid">
+              <div className="project-info-card card">
+                <h3 className="info-section-title">Project Details</h3>
+                <div className="info-item">
+                  <span className="info-label">Admin</span>
+                  <span className="info-value">{project.admin?.name}</span>
+                  <span className="info-meta">{project.admin?.email}</span>
+                </div>
+              </div>
+
+              {project.admin && project.admin._id === getUserId() && (
+                <div className="project-members-card card">
+                  <MemberManager projectId={id} project={project} onUpdated={fetchProject} />
+                </div>
+              )}
+            </div>
+
+            <h2 className="kanban-title">Task Board</h2>
+            <div className="kanban">
+              {columns.map((col) => {
+                const columnTasks = tasks.filter((t) => t.status === col);
+                return (
+                  <div className="kanban-column" key={col}>
+                    <div className="kanban-header">
+                      <h4>{col}</h4>
+                      <span className="kanban-count">{columnTasks.length}</span>
+                    </div>
+                    <div className="kanban-tasks">
+                      {columnTasks.length > 0 ? (
+                        columnTasks.map((t) => {
+                          const isAdmin = project?.admin && project.admin._id === getUserId();
+                          const assignedIsAdmin = t.assignedTo && t.assignedTo._id === project?.admin?._id;
+                          const disableStatus = !isAdmin && assignedIsAdmin;
+                          return (
+                            <TaskCard
+                              key={t._id}
+                              task={t}
+                              onChangeStatus={updateStatus}
+                              disableStatus={disableStatus}
+                              disabledMessage={disableStatus ? "Only the project admin can update tasks assigned to the admin." : undefined}
+                            />
+                          );
+                        })
+                      ) : (
+                        <div className="kanban-empty">No tasks yet</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
-        <div className="kanban">
-          {columns.map((col) => (
-            <div className="kanban-column" key={col}>
-              <h4>{col}</h4>
-              {tasks.filter((t) => t.status === col).map((t) => (
-                <TaskCard key={t._id} task={t} onChangeStatus={updateStatus} />
-              ))}
-            </div>
-          ))}
-        </div>
+        {!project && <div className="loading">Loading project...</div>}
       </div>
 
-      {showModal && <CreateTaskModal projectId={id} onClose={() => setShowModal(false)} onCreated={fetchTasks} />}
+      {showModal && project?.admin && project.admin._id === getUserId() && (
+        <CreateTaskModal
+          projectId={id}
+          project={project}
+          onClose={() => setShowModal(false)}
+          onCreated={fetchTasks}
+        />
+      )}
     </div>
   );
 }

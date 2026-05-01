@@ -1,46 +1,63 @@
 import React from "react";
 
-const priorityColor = (p) => {
-  if (p === "High") return "#ef4444"; // red
-  if (p === "Medium") return "#f59e0b"; // amber
-  return "#10b981"; // green
+const priorityTone = (priority) => {
+  if (priority === "High") return "high";
+  if (priority === "Medium") return "medium";
+  return "low";
 };
 
-export default function TaskCard({ task, onChangeStatus }) {
+export default function TaskCard({ task, onChangeStatus, disableStatus = false, disabledMessage }) {
   const statuses = ["To Do", "In Progress", "Done"];
-  const idx = statuses.indexOf(task.status);
+  const tone = priorityTone(task.priority);
 
   return (
-    <div className="task-card card" style={{ padding: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 8 }}>
-        <div>
-          <div style={{ fontWeight: 700 }}>{task.title}</div>
-          <div className="muted" style={{ fontSize: 13 }}>{task.description}</div>
+    <div className="task-card card">
+      <div className="task-card-top">
+        <div className="task-card-main">
+          <div className="task-card-title-row">
+            <h3 className="task-card-title">{task.title}</h3>
+            <span className={`task-priority task-priority-${tone}`}>{task.priority}</span>
+          </div>
+          <p className="task-card-description">
+            {task.description || "No description provided."}
+          </p>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 12, marginBottom: 6 }}>Assigned</div>
-          <div style={{ fontWeight: 600 }}>{task.assignedTo?.name || "Unassigned"}</div>
-          <div className="muted" style={{ fontSize: 12 }}>{task.assignedTo?.email || ""}</div>
+
+        <div className="task-card-assignee">
+          <span className="task-card-label">Assigned to</span>
+          <strong>{task.assignedTo?.name || "Unassigned"}</strong>
+          <span>{task.assignedTo?.email || "No assignee selected"}</span>
         </div>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12 }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div style={{ background: priorityColor(task.priority), color: "#fff", padding: "4px 8px", borderRadius: 6, fontSize: 12 }}>{task.priority}</div>
-          <div className="muted" style={{ fontSize: 12 }}>{task._id}</div>
+      <div className="task-card-footer">
+        <div className="task-card-meta">
+          <span className="task-card-status-pill">{task.status}</span>
+          <span className="task-card-id">
+            {task.dueDate
+              ? new Date(task.dueDate).toLocaleDateString()
+              : "No due date"}
+          </span>
         </div>
 
-        <div style={{ display: "flex", gap: 8, alignItems: 'center' }}>
-          <label className="muted" style={{ fontSize: 12 }}>Status</label>
+        <div className="task-card-status-control">
+          <label className="task-card-label">Status</label>
           <select
+            className="task-status-select"
             value={task.status}
-            onChange={(e) => onChangeStatus(task._id, e.target.value)}
-            style={{ padding: 8, borderRadius: 6, border: '1px solid #ddd' }}
+            onChange={(e) => !disableStatus && onChangeStatus(task._id, e.target.value)}
+            disabled={disableStatus}
+            title={disableStatus ? (disabledMessage || "Action disabled") : undefined}
           >
-            {statuses.map((s) => (
-              <option key={s} value={s}>{s}</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
             ))}
           </select>
+          {disableStatus && (
+            <div className="muted" style={{marginTop:8, fontSize:13}}>{disabledMessage || 'Update disabled'}</div>
+          )}
         </div>
       </div>
     </div>

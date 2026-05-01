@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import API from "../api/axios";
-import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import ProjectCard from "../components/ProjectCard";
 import CreateProjectModal from "../components/CreateProjectModal";
 
 export default function Projects() {
@@ -19,24 +19,32 @@ export default function Projects() {
   return (
     <div>
       <Navbar />
-      <div className="app-container mt-12">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Projects</h2>
-          <div>
-            <button className="btn" onClick={() => setShowModal(true)}>New Project</button>
+      <div className="app-container">
+        <div className="page-header">
+          <div className="page-header-content">
+            <h1>Projects</h1>
+            <p>Create and manage projects, assign team members, and track tasks in one place.</p>
           </div>
+          <button className="btn page-btn" onClick={() => setShowModal(true)}>
+            + New Project
+          </button>
         </div>
 
-        <div className="card mt-12">
-          <div>
+        {projects.length > 0 ? (
+          <div className="projects-grid">
             {projects.map((p) => (
-              <div className="project-item" key={p._id}>
-                <Link to={`/project/${p._id}`}>{p.name}</Link>
-                <div className="muted">{p.description}</div>
-              </div>
+              <ProjectCard key={p._id} project={p} />
             ))}
           </div>
-        </div>
+        ) : (
+          <div className="empty-state card">
+            <div className="empty-state-icon">📋</div>
+            <h3>No projects yet</h3>
+            <p>Get started by creating your first project.</p>
+            <button className="btn" onClick={() => setShowModal(true)}>Create your first project</button>
+          </div>
+        )}
+
         {showModal && (
           <CreateProjectModal
             onClose={() => setShowModal(false)}
