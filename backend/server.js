@@ -31,3 +31,10 @@ app.listen(PORT, () => {
 });
 app.use("/api/projects", require("./routes/projectRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
+app.use(cors({
+
+  origin: "*", // later replace with your frontend URL
+
+  credentials: true
+
+}));
