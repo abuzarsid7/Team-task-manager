@@ -1,79 +1,176 @@
-Team Task Manager
-=================
+# 📌 Team Task Manager
 
-Overview
---------
-Team Task Manager is a simple task and project management app with a Node/Express + MongoDB backend and a React frontend.
+A full-stack web application where teams can manage projects, assign tasks, and track progress efficiently.
 
-Tech stack
-----------
-- Backend: Node.js, Express, Mongoose (MongoDB), JWT auth
-- Frontend: React, React Router, Axios
+---
 
-Repository layout
------------------
-backend/    - Express server, routes, controllers, models
-frontend/   - React app, components, pages, context
+## 🚀 Features
 
-Quick setup
------------
-1. Backend
-   - Copy `.env.example` (if present) to `.env` and set:
-     - `MONGO_URI` (MongoDB connection string)
-     - `JWT_SECRET` (secret for signing tokens)
-     - `PORT` (optional, default 5001)
-   - Install and run:
-     npm install
-     npm run dev    # or `node server.js` depending on scripts
+- 🔐 User Authentication (JWT-based)
+- 📁 Project Management (Admin & Members)
+- ✅ Task Creation & Assignment
+- 📊 Dashboard (task stats, overdue tasks)
+- 🔑 Role-Based Access Control
 
-2. Frontend
-   - Change into `frontend/` and install:
-     npm install
-     npm run dev    # starts Vite/React dev server
+---
 
-API base URL
-------------
-- Default backend port: 5001 (see `backend/server.js`).
-- API base (example): http://localhost:5001/api
+## 🛠 Tech Stack
 
-Auth
-----
-- Authentication uses JWT. Include header `Authorization: Bearer <token>` on protected requests.
+### Frontend
+- React.js
+- Axios
+- Context API
 
-Key API endpoints (summary)
----------------------------
-- POST /api/auth/login         - login, returns JWT
-- POST /api/auth/signup        - create user
-- GET  /api/projects/          - list projects where user is member
-- POST /api/projects/create    - create a project
-- POST /api/projects/add-member - add member to project (admin)
-- POST /api/projects/remove-member - remove member (admin)
-- GET  /api/tasks/dashboard    - dashboard stats (total, overdue, status breakdown, tasksPerUser)
-- GET  /api/tasks/project/:projectId - list tasks for a project
-- GET  /api/tasks/my-tasks     - list tasks assigned to current user
-- POST /api/tasks/create       - create a task
-- PUT  /api/tasks/update-status - update task status (only assignee or project admin)
+### Backend
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- JWT Authentication
 
-Frontend notes
---------------
-- Routes are defined in `frontend/src/routes/AppRoutes.jsx`:
-  - `/` (Login), `/signup`, `/dashboard`, `/projects`, `/project/:id`, `/my-tasks`
-- `AuthContext` (frontend/src/context/AuthContext.jsx) provides `login`, `logout`, and token persistence.
-- `Navbar` includes links to Dashboard, Projects, New Project (opens projects modal), and My Tasks.
+### Deployment
+- Railway (Frontend + Backend)
 
-Development tips
-----------------
-- Start backend first so frontend API calls succeed.
-- If you get 401 responses, ensure the token is present in localStorage and sent in `Authorization` header by the Axios instance at `frontend/src/api/axios.js`.
-- To enable CORS for a specific origin, update the `cors()` configuration in `backend/server.js`.
+---
 
-Next improvements (suggestions)
------------------------------
-- Replace `alert()` calls with a toast/notification system on the frontend.
-- Add optimistic UI updates for task status changes.
-- Add drag-and-drop Kanban (react-beautiful-dnd) for better UX.
+## 📂 Folder Structure
+root/
+│
+├── frontend/          # React frontend
+│
+├── backend/          # Node backend
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│
+├── .env
+├── package.json
+---
 
-Contact
--------
-For local development help, run the backend and frontend dev servers and check browser console + server logs for errors.
+## ⚙️ Setup Instructions (Local Development)
 
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/your-username/team-task-manager.git
+cd team-task-manager
+```
+---
+## 2️⃣ Setup Backend
+```bash
+cd server
+npm install
+```
+Create a .env file inside server/:
+```bash
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+Run backend:
+```bash
+npm run dev
+```
+---
+## 3️⃣ Setup Frontend
+```bash
+cd client
+npm install
+```
+Create .env in frontend:
+
+```bash
+VITE_API_URL=http://localhost:5000/api
+```
+Run frontend:
+```bash 
+npm run dev
+```
+---
+## 🔗 API Endpoints
+
+### 🔐 Authentication
+
+| Method | Endpoint                | Description              |
+|--------|------------------------|--------------------------|
+| POST   | /api/auth/register     | Register a new user      |
+| POST   | /api/auth/login        | Login user               |
+
+---
+
+### 📁 Projects
+
+| Method | Endpoint                      | Description                      |
+|--------|------------------------------|----------------------------------|
+| GET    | /api/projects                | Get all projects for user        |
+| POST   | /api/projects                | Create a new project             |
+| POST   | /api/projects/add-member     | Add member to a project          |
+
+---
+
+### ✅ Tasks
+
+| Method | Endpoint              | Description                  |
+|--------|----------------------|------------------------------|
+| POST   | /api/tasks           | Create a new task            |
+| GET    | /api/tasks           | Get tasks                    |
+| PUT    | /api/tasks/:id       | Update task status/details   |
+---
+## 🚀 Deployment (Railway)
+
+### 1️⃣ Push Code to GitHub
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin <your-repository-url>
+git push -u origin main
+```
+### 2️⃣ Deploy Backend on Railway
+1. Go to Railway: https://railway.app
+2. Click “New Project” → “Deploy from GitHub Repo”
+3. Select your repository
+4. Choose the backend (server) folder if prompted
+
+Set Environment Variables:
+```bash
+MONGO_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_secret_key
+
+PORT=5000
+```
+
+5. Click Deploy
+6. After deployment, Railway will provide a public backend URL
+---
+
+### 3️⃣ Deploy Frontend on Railway
+
+1. In the same Railway project, click “New Service”
+2. Select your repository again
+3. Choose the frontend (client) folder
+
+Set Environment Variable:
+```bash
+VITE_API_URL=https://your-backend.up.railway.app/api
+```
+4. Click Deploy
+---
+### 4️⃣ Connect Frontend & Backend
+Make sure your frontend is calling the deployed backend URL.
+
+Update API base URL in your frontend config (if needed)
+---
+
+### 6️⃣ Verify Deployment
+
+* Open your frontend URL in browser
+* Try logging in / creating a project
+* Ensure API calls are working
+
+### 🌐 Live URLs
+
+* Frontend: https://team-task-manager-production-1e08.up.railway.app/
+* Backend: https://team-task-manager-production-320b.up.railway.app/
