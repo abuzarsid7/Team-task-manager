@@ -1,9 +1,16 @@
-import { createContext, useMemo, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+    setLoading(false);
+  }, []);
 
   const login = (newToken) => {
     localStorage.setItem("token", newToken);
@@ -22,22 +29,22 @@ export const AuthProvider = ({ children }) => {
     logout
   }), [token]);
 
-  // helper to extract userId from JWT token payload
   const getUserId = () => {
     if (!token) return null;
     try {
       const parts = token.split('.');
-      if (parts.length < 2) return null;
       const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const decoded = JSON.parse(decodeURIComponent(escape(window.atob(payload))));
-      return decoded.userId || decoded.user_id || decoded.sub || null;
-    } catch (e) {
+      const decoded = JSON.parse(atob(payload));
+      return decoded.userId || decoded.sub || null;
+    } catch {
       return null;
     }
   };
 
-  // extend exported value with helper
-  const exported = useMemo(() => ({ ...value, getUserId }), [value, token]);
+  const exported = useMemo(() => ({ ...value, getUserId }), [value]);
+
+  // 🚨 THIS LINE FIXES YOUR ISSUE
+  if (loading) return null;
 
   return (
     <AuthContext.Provider value={exported}>
